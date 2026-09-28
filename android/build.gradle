@@ -1,10 +1,12 @@
 
 buildscript {
     ext.kotlin_version = '1.9.0'
+
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -31,12 +33,9 @@ subprojects {
 subprojects { project ->
     if (project.name == 'flutter_overlay_window') {
         project.plugins.withId('com.android.library') {
-            project.extensions.configure(
-                com.android.build.gradle.LibraryExtension
-            ) {
-                namespace = 'com.pravera.flutter_overlay_window'
-                compileSdkVersion 34
-            }
+            def androidExt = project.extensions.findByName('android')
+            androidExt.namespace = 'com.pravera.flutter_overlay_window'
+            androidExt.compileSdkVersion 34
         }
     }
 }
