@@ -1,4 +1,3 @@
-
 buildscript {
     ext.kotlin_version = '1.9.0'
 
@@ -30,12 +29,16 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+// Fix flutter_overlay_window namespace
 subprojects { project ->
     if (project.name == 'flutter_overlay_window') {
         project.plugins.withId('com.android.library') {
             def androidExt = project.extensions.findByName('android')
-            androidExt.namespace = 'com.pravera.flutter_overlay_window'
-            androidExt.compileSdkVersion 34
+
+            if (androidExt != null) {
+                androidExt.namespace = 'com.example.flutter_overlay_window'
+                androidExt.compileSdkVersion 34
+            }
         }
     }
 }
