@@ -31,28 +31,30 @@ class _OverlayScreenState extends State<OverlayScreen> {
     super.dispose();
   }
 
-  void _expand() {
+  Future<void> _expand() async {
+    if (!mounted) return;
+
     setState(() {
       _state = OverlayState.scanning;
     });
 
-    FlutterOverlayWindow.resizeOverlay(
-      MediaQuery.of(context).size.width.toInt(),
-      MediaQuery.of(context).size.height.toInt(),
-      true,
+    await FlutterOverlayWindow.resizeOverlay(
+      360,
+      600,
     );
 
     _startScan();
   }
 
-  void _collapse() {
+  Future<void> _collapse() async {
     _stopScan();
 
-    FlutterOverlayWindow.resizeOverlay(
+    await FlutterOverlayWindow.resizeOverlay(
       72,
       72,
-      true,
     );
+
+    if (!mounted) return;
 
     setState(() {
       _state = OverlayState.icon;
@@ -110,8 +112,10 @@ class _OverlayScreenState extends State<OverlayScreen> {
     switch (_result!.direction) {
       case SignalDirection.buy:
         return 'BUY';
+
       case SignalDirection.sell:
         return 'SELL';
+
       case SignalDirection.none:
         return 'WAIT';
     }
@@ -181,6 +185,7 @@ class _OverlayScreenState extends State<OverlayScreen> {
                 ],
               ),
               const SizedBox(height: 20),
+
               if (_state == OverlayState.scanning)
                 const Column(
                   children: [
@@ -188,12 +193,14 @@ class _OverlayScreenState extends State<OverlayScreen> {
                     SizedBox(height: 16),
                     Text(
                       'Scanning market...',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
-              if (_state == OverlayState.result &&
-                  _result != null)
+
+              if (_state == OverlayState.result && _result != null)
                 Column(
                   children: [
                     Text(
@@ -224,10 +231,12 @@ class _OverlayScreenState extends State<OverlayScreen> {
                     const SizedBox(height: 12),
                     ..._result!.confirmations.map(
                       (confirmation) => Padding(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 3,
+                        ),
                         child: Text(
                           confirmation,
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white70,
                           ),
