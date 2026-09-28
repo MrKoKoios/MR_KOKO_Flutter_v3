@@ -18,11 +18,21 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(':app')
+
+    afterEvaluate { project ->
+        if (project.name == 'flutter_overlay_window') {
+            project.android {
+                namespace 'com.pravera.flutter_overlay_window'
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
