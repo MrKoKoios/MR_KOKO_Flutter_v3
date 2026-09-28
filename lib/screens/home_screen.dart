@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 import '../database/database_helper.dart';
-import '../engine/signal_engine.dart';
 import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,7 +13,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final DatabaseHelper _db = DatabaseHelper();
-  final SignalEngine _engine = SignalEngine();
 
   List<Map<String, dynamic>> _history = [];
 
@@ -27,18 +25,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadHistory() async {
     final data = await _db.getHistory();
 
-    if (mounted) {
-      setState(() {
-        _history = data;
-      });
-    }
+    if (!mounted) return;
+
+    setState(() {
+      _history = data;
+    });
   }
 
   Future<void> _launchOverlay() async {
-    final isPermissionGranted =
-        await FlutterOverlayWindow.isPermissionGranted();
+    final permission = await FlutterOverlayWindow.isPermissionGranted();
 
-    if (!isPermissionGranted) {
+    if (!permission) {
       await FlutterOverlayWindow.requestPermission();
     }
 
@@ -72,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(
                   builder: (_) => const HistoryScreen(),
                 ),
-              );
+              ).then((_) => _loadHistory());
             },
           ),
           IconButton(
@@ -98,23 +95,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final item = _history[index];
 
+                        final direction =
+                            item['direction']?.toString().toLowerCase();
+
+                        final isBuy = direction == 'buy';
+
                         return Card(
                           child: ListTile(
                             leading: Icon(
-                              item['direction'] == 'buy'
+                              isBuy
                                   ? Icons.trending_up
                                   : Icons.trending_down,
-                              color: item['direction'] == 'buy'
-                                  ? Colors.green
-                                  : Colors.red,
+                              color: isBuy ? Colors.green : Colors.red,
                             ),
                             title: Text(
-                              '${item['direction']?.toString().toUpperCase()} '
-                              '${item['confidence']}%',
+                              '${direction?.toUpperCase() ?? 'WAIT'} '
+                              '${item['confidence'] ?? 0}%',
                             ),
                             subtitle: Text(
-                              '${item['rule']}\n'
-                              '${item['timeframe']}',
+                              '${item['rule'] ?? ''}\n'
+                              '${item['timeframe'] ?? ''}',
                             ),
                           ),
                         );
