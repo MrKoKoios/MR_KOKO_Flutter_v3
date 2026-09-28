@@ -1,3 +1,4 @@
+
 name: Build MR KOKO APK
 
 on:
@@ -26,6 +27,16 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Fix Overlay Window Manifest
+        run: |
+          MANIFEST="$HOME/.pub-cache/hosted/pub.dev/flutter_overlay_window-0.3.3/android/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i 's/package="com.example.flutter_overlay_window"//' "$MANIFEST"
+          else
+            echo "Overlay Window Manifest not found"
+            exit 1
+          fi
 
       - name: Build APK
         run: flutter build apk --release --no-obfuscate
