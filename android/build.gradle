@@ -1,32 +1,42 @@
 buildscript {
-ext.kotlin_version = '1.9.0'
-repositories {
-google()
-mavenCentral()
-}
-dependencies {
-classpath 'com.android.tools.build:gradle:8.1.0'
-classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-}
+    ext.kotlin_version = '1.9.0'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
 
 allprojects {
-repositories {
-google()
-mavenCentral()
-}
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
 
 rootProject.buildDir = '../build'
 
 subprojects {
-project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 
 subprojects {
-project.evaluationDependsOn(':app')
+    project.evaluationDependsOn(':app')
+}
+
+subprojects {
+    if (it.name == 'flutter_overlay_window') {
+        it.plugins.withId('com.android.library') {
+            it.android {
+                namespace 'com.pravera.flutter_overlay_window'
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
-delete rootProject.buildDir
+    delete rootProject.buildDir
 }
